@@ -2,7 +2,7 @@
 Project Documentation
 This Ansible playbook automates the installation and configuration of the Nexus Repository Manager on a remote target server.
 
-###Prerequisites
+### Prerequisites
 Ansible must be installed on the local machine that will run the playbook.
 The target server must have SSH connectivity configured and the SSH credentials must be accessible to the local machine.
 The target server must have the Yum package manager installed and configured.
@@ -22,7 +22,7 @@ Open and configure the nexus.rc file.
 Create the Nexus systemd unit file /etc/systemd/system/nexus.service.
 Add the Nexus service to boot using the chkconfig command.
 Start the Nexus service.
-##How to Run the Playbook
+## How to Run the Playbook
 Open a terminal on the local machine.
 Navigate to the directory containing the playbook.
 Run the playbook using the following command:
