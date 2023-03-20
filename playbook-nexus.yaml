@@ -1,0 +1,99 @@
+---
+- name: install Nexus
+  hosts: target
+  become: true
+  tasks:
+    - name: update the yum packages
+      yum:
+        name: "*"
+        state: latest
+
+    - name: Install Wget Package
+      yum:
+        name: wget
+        state: present    
+
+    - name: install java
+      yum:
+        name: java-1.8.0-openjdk.x86_64
+        state: present
+
+    - name: Create /app directory if it doesn't exist
+      file:
+        path: /app
+        state: directory
+
+    - name: Change working directory to /app
+      shell: cd /app 
+
+    - name: Download latest Nexus tarball
+      get_url:
+        url: https://download.sonatype.com/nexus/3/latest-unix.tar.gz
+        dest: /app/nexus.tar.gz
+
+
+    - name: Extract Nexus archive
+      unarchive:
+        src: /app/nexus.tar.gz
+        dest: /app/
+        remote_src: yes
+
+    - name: Rename the Nexus file
+      command: mv /app/nexus-3.49.0-02 /app/nexus
+      args:
+        chdir: /app/
+    - name: adduser nexus
+      user:
+        name: nexus
+        comment: "nexus user"
+        createhome: yes
+
+    - name: Change ownership of /app/nexus directory
+      file:
+        path: /app/nexus
+        owner: nexus
+        group: nexus
+        recurse: yes
+
+    - name: Change ownership of /app/sonatype-work
+      file:
+        path: /app/sonatype-work
+        owner: nexus
+        group: nexus
+        recurse: yes
+
+    - name: Open and configure nexus.rc file
+      lineinfile:
+        path: /app/nexus/bin/nexus.rc
+        regexp: '^#run_as_user='
+        line: 'run_as_user="nexus"'
+
+    - name: Create Nexus systemd unit file
+      copy:
+        content: |
+          [Unit]
+          Description=nexus service
+          After=network.target
+
+          [Service]
+          Type=forking
+          LimitNOFILE=65536
+          User=nexus
+          Group=nexus
+          ExecStart=/app/nexus/bin/nexus start
+          ExecStop=/app/nexus/bin/nexus stop
+          User=nexus
+          Restart=on-abort
+
+          [Install]
+          WantedBy=multi-user.target
+        dest: /etc/systemd/system/nexus.service
+
+    - name: Add Nexus service to boot
+      command: chkconfig nexus on
+
+    - name: Start Nexus service
+      systemd:
+        name: nexus
+        state: started
+            
