@@ -3,7 +3,7 @@ Project Documentation
 This Ansible playbook automates the installation and configuration of the Nexus Repository Manager on a remote target server.
 
 ### Prerequisites
-Ansible must be installed on the local machine that will run the playbook.
+Ansible must be installed on the local machine that will run the playbook./n
 The target server must have SSH connectivity configured and the SSH credentials must be accessible to the local machine.
 The target server must have the Yum package manager installed and configured.
 Playbook Tasks
